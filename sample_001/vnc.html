@@ -196,10 +196,10 @@
     <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
     <script>
         function GoOn(){
-            $D('noVNC_host').value = "192.168.1.2";
-            $D('noVNC_port').value = "5901";
-            $D('noVNC_password').value = "";
-            UI.connect();
+            //$D('noVNC_host').value = "192.168.1.2";
+            //$D('noVNC_port').value = "5901";
+            //$D('noVNC_password').value = "";
+            //UI.connect();
         }
       //  window.onload = UI.load;
       window.onload = function() {
@@ -244,6 +244,16 @@
           console.log('Message [' + event.senderId + ']: ' + event.data);
           // display the message from the sender
           displayText(event.data);
+          var msg = event.data.split(':');
+          if(msg[0]=="xmpp" && msg[3] == "connect") {
+            $D('noVNC_host').value = msg[4];
+            $D('noVNC_port').value = msg[5];
+            $D('noVNC_password').value = "";
+            UI.connect();
+          }
+          if(msg[0]=="xmpp" && msg[3] == "disconnect") {
+            UI.disconnect();
+          }
           // inform all senders on the CastMessageBus of the incoming message event
           // sender message listener will be invoked
           window.messageBus.send(event.senderId, event.data);
