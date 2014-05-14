@@ -201,6 +201,17 @@
             //$D('noVNC_password').value = "";
             //UI.connect();
         }
+        function updateStatusBar(msg) {
+            var s, sb;
+            s = $D('noVNC_status');
+            sb = $D('noVNC_status_bar');
+
+            if (typeof(msg) !== 'undefined') {
+                sb.setAttribute("class", "noVNC_status_" + "error");
+                s.innerHTML = msg;
+            }
+        }
+
       //  window.onload = UI.load;
       window.onload = function() {
         UI.load();
@@ -250,9 +261,11 @@
             $D('noVNC_port').value = msg[5];
             $D('noVNC_password').value = "";
             UI.connect();
+            updateStatusBar(msg[4]);
           }
           if(msg[0]=="xmpp" && msg[3] == "disconnect") {
             UI.disconnect();
+            updateStatusBar(msg[3]);
           }
           // inform all senders on the CastMessageBus of the incoming message event
           // sender message listener will be invoked
