@@ -2,6 +2,24 @@
 <html>
 <head>
 
+    <style type="text/css">
+	  body {
+	    overflow:hidden;
+	  }
+      #message{
+	    height:100px;
+	    width:300px;
+	    text-align:center;
+	    border:0px solid silver;
+	    display: table-cell;
+	    vertical-align:middle;
+	    color:#FFFFFF;
+	    background-color:#000000;
+	    font-weight:bold;
+	    font-family:Verdana, Geneva, sans-serif;
+	    font-size:20px;
+	}
+    </style>
     <!--
     noVNC example: simple example using default UI
     Copyright (C) 2012 Joel Martin
@@ -45,6 +63,7 @@
 </head>
 
 <body>
+    <div id="message">debug message</div>
     <div id="noVNC-control-bar">
         <!--noVNC Mobile Device only Buttons-->
         <div class="noVNC-buttons-left">
@@ -255,7 +274,8 @@
           console.log('Message [' + event.senderId + ']: ' + event.data);
           // display the message from the sender
           displayText(event.data);
-          var msg = event.data.split(':');
+          var mydata = event.data;
+          var msg = mydata.split(':');
           if(msg[0]=="xmpp" && msg[3] == "connect") {
             $D('noVNC_host').value = msg[4];
             $D('noVNC_port').value = msg[5];
