@@ -89,11 +89,11 @@
           var mydata = event.data;
           var msg = mydata.split(':');
           if(msg[0]=="xmpp" && msg[3] == "connect") {
-            //document.getElementById('noVNC_screen').style.backgroundColor="rgba(0,0,0,0.618)";            
+            document.getElementById('noVNC_screen').style.backgroundColor="rgba(0,0,0,0.618)";            
             rfb.connect(msg[4], msg[5], "", "");
           }
           if(msg[0]=="xmpp" && msg[3] == "disconnect") {
-            //document.getElementById('noVNC_screen').style.backgroundColor="rgba(0,0,0,0)";            
+            document.getElementById('noVNC_screen').style.backgroundColor="rgba(0,0,0,0)";            
             rfb.disconnect();
           }
           // inform all senders on the CastMessageBus of the incoming message event
