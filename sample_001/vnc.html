@@ -32,18 +32,17 @@
         <script>
         /*jslint white: false */
         /*global window, $, Util, RFB, */
-        "use strict";
 
         var rfb;
 
         function GoOn(){
             document.getElementById('noVNC_screen').style.backgroundColor="rgba(0,0,0,0.618)";
             rfb.connect("192.168.1.3", "5901", "", "");
-        }
+        };
         function DownIt(){
             document.getElementById('noVNC_screen').style.backgroundColor="rgba(0,0,0,0)";
             rfb.disconnect();
-        }
+        };
       window.onload = function() {
         rfb = new RFB({'target':       $D('noVNC_canvas'),
                        'encrypt':      WebUtil.getQueryVar('encrypt', false)});
