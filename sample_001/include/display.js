@@ -1,11 +1,3 @@
-/*
- * noVNC: HTML5 VNC client
- * Copyright (C) 2012 Joel Martin
- * Licensed under LGPL-3 (see LICENSE.txt)
- *
- * See README.md for usage and integration instructions.
- */
-
 /*jslint browser: true, white: false, bitwise: false */
 /*global Util, Base64, changeCursor */
 

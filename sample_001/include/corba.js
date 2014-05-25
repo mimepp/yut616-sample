@@ -1,19 +1,8 @@
-/*
- * noVNC: HTML5 VNC client
- * Copyright (C) 2012 Joel Martin
- * Licensed under LGPL-3 (see LICENSE.txt)
- *
- * See README.md for usage and integration instructions.
- *
- * TIGHT decoder portion:
- * (c) 2012 Michael Tinglof, Joe Balaz, Les Piech (Mercuri.ca)
- */
-
 /*jslint white: false, browser: true, bitwise: false, plusplus: false */
 /*global window, Util, Display, Keyboard, Mouse, Websock, Websock_native, Base64, DES */
 
 
-function RFB(defaults) {
+function CORBA(defaults) {
 "use strict";
 
 var that           = {},  // Public API methods
@@ -33,17 +22,17 @@ var that           = {},  // Public API methods
 
 
     //
-    // Private RFB namespace variables
+    // Private CORBA namespace variables
     //
-    rfb_host       = '',
-    rfb_port       = 5900,
-    rfb_password   = '',
-    rfb_path       = '',
+    corba_host       = '',
+    corba_port       = 5900,
+    corba_password   = '',
+    corba_path       = '',
 
-    rfb_state      = 'disconnected',
-    rfb_version    = 0,
-    rfb_max_version= 3.8,
-    rfb_auth_scheme= '',
+    corba_state      = 'disconnected',
+    corba_version    = 0,
+    corba_max_version= 3.8,
+    corba_auth_scheme= '',
 
 
     // In preference order
@@ -130,7 +119,7 @@ var that           = {},  // Public API methods
 
 // Configuration attributes
 Util.conf_defaults(conf, that, defaults, [
-    ['target',             'wo', 'dom', null, 'VNC display rendering Canvas object'],
+    ['target',             'wo', 'dom', null, 'mirror4cast display rendering Canvas object'],
     ['focusContainer',     'wo', 'dom', document, 'DOM element that captures keyboard input'],
 
     ['encrypt',            'rw', 'bool', false, 'Use TLS/SSL/wss encryption'],
@@ -142,7 +131,7 @@ Util.conf_defaults(conf, that, defaults, [
     ['connectTimeout',     'rw', 'int', def_con_timeout, 'Time (s) to wait for connection'],
     ['disconnectTimeout',  'rw', 'int', 3,    'Time (s) to wait for disconnection'],
 
-    // UltraVNC repeater ID to connect to
+    // Ultramirror4cast repeater ID to connect to
     ['repeaterID',         'rw', 'str',  '',    'RepeaterID to connect to'],
 
     ['viewportDrag',       'rw', 'bool', false, 'Move the viewport on mouse drags'],
@@ -152,17 +141,17 @@ Util.conf_defaults(conf, that, defaults, [
 
     // Callback functions
     ['onUpdateState',      'rw', 'func', function() { },
-        'onUpdateState(rfb, state, oldstate, statusMsg): RFB state update/change '],
+        'onUpdateState(corba, state, oldstate, statusMsg): CORBA state update/change '],
     ['onPasswordRequired', 'rw', 'func', function() { },
-        'onPasswordRequired(rfb): VNC password is required '],
+        'onPasswordRequired(corba): mirror4cast password is required '],
     ['onClipboard',        'rw', 'func', function() { },
-        'onClipboard(rfb, text): RFB clipboard contents received'],
+        'onClipboard(corba, text): CORBA clipboard contents received'],
     ['onBell',             'rw', 'func', function() { },
-        'onBell(rfb): RFB Bell message received '],
+        'onBell(corba): CORBA Bell message received '],
     ['onFBUReceive',       'rw', 'func', function() { },
-        'onFBUReceive(rfb, fbu): RFB FBU received but not yet processed '],
+        'onFBUReceive(corba, fbu): CORBA FBU received but not yet processed '],
     ['onFBUComplete',      'rw', 'func', function() { },
-        'onFBUComplete(rfb, fbu): RFB FBU received and processed '],
+        'onFBUComplete(corba, fbu): CORBA FBU received and processed '],
 
     // These callback names are deprecated
     ['updateState',        'rw', 'func', function() { },
@@ -202,7 +191,7 @@ that.get_mouse = function() { return mouse; };
 // constant across connect/disconnect
 function constructor() {
     var i, rmode;
-    Util.Debug(">> RFB.constructor");
+    Util.Debug(">> CORBA.constructor");
 
     // Create lookup tables based encoding number
     for (i=0; i < encodings.length; i+=1) {
@@ -228,8 +217,8 @@ function constructor() {
     ws = new Websock();
     ws.on('message', handle_message);
     ws.on('open', function() {
-        if (rfb_state === "connect") {
-            updateState('ProtocolVersion', "Starting VNC handshake");
+        if (corba_state === "connect") {
+            updateState('ProtocolVersion', "Starting mirror4cast handshake");
         } else {
             fail("Got unexpected WebSockets connection");
         }
@@ -244,11 +233,11 @@ function constructor() {
             }
             msg += ")";
         }
-        if (rfb_state === 'disconnect') {
-            updateState('disconnected', 'VNC disconnected' + msg);
-        } else if (rfb_state === 'ProtocolVersion') {
+        if (corba_state === 'disconnect') {
+            updateState('disconnected', 'mirror4cast disconnected' + msg);
+        } else if (corba_state === 'ProtocolVersion') {
             fail('Failed to connect to server' + msg);
-        } else if (rfb_state in {'failed':1, 'disconnected':1}) {
+        } else if (corba_state in {'failed':1, 'disconnected':1}) {
             Util.Error("Received onclose while disconnected" + msg);
         } else  {
             fail('Server disconnected' + msg);
@@ -265,7 +254,7 @@ function constructor() {
     /* Check web-socket-js if no builtin WebSocket support */
     if (Websock_native) {
         Util.Info("Using native WebSockets");
-        updateState('loaded', 'noVNC ready: native WebSockets, ' + rmode);
+        updateState('loaded', 'mirror4cast ready: native WebSockets, ' + rmode);
     } else {
         Util.Warn("Using web-socket-js bridge. Flash version: " +
                   Util.Flash.version);
@@ -276,32 +265,32 @@ function constructor() {
             updateState('fatal',
                     "'file://' URL is incompatible with Adobe Flash");
         } else {
-            updateState('loaded', 'noVNC ready: WebSockets emulation, ' + rmode);
+            updateState('loaded', 'mirror4cast ready: WebSockets emulation, ' + rmode);
         }
     }
 
-    Util.Debug("<< RFB.constructor");
+    Util.Debug("<< CORBA.constructor");
     return that;  // Return the public API interface
 }
 
 function connect() {
-    Util.Debug(">> RFB.connect");
+    Util.Debug(">> CORBA.connect");
     var uri;
     
     if (typeof UsingSocketIO !== "undefined") {
-        uri = "http://" + rfb_host + ":" + rfb_port + "/" + rfb_path;
+        uri = "http://" + corba_host + ":" + corba_port + "/" + corba_path;
     } else {
         if (conf.encrypt) {
             uri = "wss://";
         } else {
             uri = "ws://";
         }
-        uri += rfb_host + ":" + rfb_port + "/" + rfb_path;
+        uri += corba_host + ":" + corba_port + "/" + corba_path;
     }
     Util.Info("connecting to " + uri);
     ws.open(uri);
 
-    Util.Debug("<< RFB.connect");
+    Util.Debug("<< CORBA.connect");
 }
 
 // Initialize variables that are reset before each connection
@@ -367,17 +356,17 @@ print_stats = function() {
  *   failed       - abnormal disconnect
  *   fatal        - failed to load page, or fatal error
  *
- * RFB protocol initialization states:
+ * CORBA protocol initialization states:
  *   ProtocolVersion 
  *   Security
  *   Authentication
- *   password     - waiting for password, not part of RFB
+ *   password     - waiting for password, not part of CORBA
  *   SecurityResult
  *   ClientInitialization - not triggered by server message
  *   ServerInitialization (to normal)
  */
 updateState = function(state, statusMsg) {
-    var func, cmsg, oldstate = rfb_state;
+    var func, cmsg, oldstate = corba_state;
 
     if (state === oldstate) {
         /* Already here, ignore */
@@ -407,7 +396,7 @@ updateState = function(state, statusMsg) {
             display.defaultCursor();
             if ((Util.get_logging() !== 'debug') ||
                 (state === 'loaded')) {
-                // Show noVNC logo on load and when disconnected if
+                // Show mirror4cast logo on load and when disconnected if
                 // debug is off
                 display.clear();
             }
@@ -431,18 +420,18 @@ updateState = function(state, statusMsg) {
 
     if ((oldstate === 'failed') && (state === 'disconnected')) {
         // Do disconnect action, but stay in failed state
-        rfb_state = 'failed';
+        corba_state = 'failed';
     } else {
-        rfb_state = state;
+        corba_state = state;
     }
 
-    if (connTimer && (rfb_state !== 'connect')) {
+    if (connTimer && (corba_state !== 'connect')) {
         Util.Debug("Clearing connect timer");
         clearInterval(connTimer);
         connTimer = null;
     }
 
-    if (disconnTimer && (rfb_state !== 'disconnect')) {
+    if (disconnTimer && (corba_state !== 'disconnect')) {
         Util.Debug("Clearing disconnect timer");
         clearInterval(disconnTimer);
         disconnTimer = null;
@@ -528,7 +517,7 @@ handle_message = function() {
         Util.Warn("handle_message called on empty receive queue");
         return;
     }
-    switch (rfb_state) {
+    switch (corba_state) {
     case 'disconnected':
     case 'failed':
         Util.Error("Got data while disconnected");
@@ -581,7 +570,7 @@ function flushClient() {
 // overridable for testing
 checkEvents = function() {
     var now;
-    if (rfb_state === 'normal' && !viewportDragging) {
+    if (corba_state === 'normal' && !viewportDragging) {
         if (! flushClient()) {
             now = new Date().getTime();
             if (now > last_req_time + conf.fbu_req_rate) {
@@ -658,9 +647,9 @@ mouseMove = function(x, y) {
 // Server message handlers
 //
 
-// RFB/VNC initialisation message handler
+// CORBA/mirror4cast initialisation message handler
 init_msg = function() {
-    //Util.Debug(">> init_msg [rfb_state '" + rfb_state + "']");
+    //Util.Debug(">> init_msg [corba_state '" + corba_state + "']");
 
     var strlen, reason, length, sversion, cversion, repeaterID,
         i, types, num_types, challenge, response, bpp, depth,
@@ -668,7 +657,7 @@ init_msg = function() {
         green_shift, blue_shift, true_color, name_length, is_repeater;
 
     //Util.Debug("ws.rQ (" + ws.rQlen() + ") " + ws.rQslice(0));
-    switch (rfb_state) {
+    switch (corba_state) {
 
     case 'ProtocolVersion' :
         if (ws.rQlen() < 12) {
@@ -678,14 +667,14 @@ init_msg = function() {
         Util.Info("Server ProtocolVersion: " + sversion);
         is_repeater = 0;
         switch (sversion) {
-            case "000.000": is_repeater = 1; break; // UltraVNC repeater
-            case "003.003": rfb_version = 3.3; break;
-            case "003.006": rfb_version = 3.3; break;  // UltraVNC
-            case "003.889": rfb_version = 3.3; break;  // Apple Remote Desktop
-            case "003.007": rfb_version = 3.7; break;
-            case "003.008": rfb_version = 3.8; break;
-            case "004.000": rfb_version = 3.8; break;  // Intel AMT KVM
-            case "004.001": rfb_version = 3.8; break;  // RealVNC 4.6
+            case "000.000": is_repeater = 1; break; // Ultramirror4cast repeater
+            case "003.003": corba_version = 3.3; break;
+            case "003.006": corba_version = 3.3; break;  // Ultramirror4cast
+            case "003.889": corba_version = 3.3; break;  // Apple Remote Desktop
+            case "003.007": corba_version = 3.7; break;
+            case "003.008": corba_version = 3.8; break;
+            case "004.000": corba_version = 3.8; break;  // Intel AMT KVM
+            case "004.001": corba_version = 3.8; break;  // Realmirror4cast 4.6
             default:
                 return fail("Invalid server version " + sversion);
         }
@@ -697,8 +686,8 @@ init_msg = function() {
             ws.send_string(repeaterID);
             break;
         }
-        if (rfb_version > rfb_max_version) { 
-            rfb_version = rfb_max_version;
+        if (corba_version > corba_max_version) { 
+            corba_version = corba_max_version;
         }
 
         if (! test_mode) {
@@ -710,14 +699,14 @@ init_msg = function() {
                 }, 50);
         }
 
-        cversion = "00" + parseInt(rfb_version,10) +
-                   ".00" + ((rfb_version * 10) % 10);
+        cversion = "00" + parseInt(corba_version,10) +
+                   ".00" + ((corba_version * 10) % 10);
         ws.send_string("RFB " + cversion + "\n");
         updateState('Security', "Sent ProtocolVersion: " + cversion);
         break;
 
     case 'Security' :
-        if (rfb_version >= 3.7) {
+        if (corba_version >= 3.7) {
             // Server sends supported list, client decides 
             num_types = ws.rQshift8();
             if (ws.rQwait("security type", num_types, 1)) { return false; }
@@ -726,59 +715,59 @@ init_msg = function() {
                 reason = ws.rQshiftStr(strlen);
                 return fail("Security failure: " + reason);
             }
-            rfb_auth_scheme = 0;
+            corba_auth_scheme = 0;
             types = ws.rQshiftBytes(num_types);
             Util.Debug("Server security types: " + types);
             for (i=0; i < types.length; i+=1) {
-                if ((types[i] > rfb_auth_scheme) && (types[i] < 3)) {
-                    rfb_auth_scheme = types[i];
+                if ((types[i] > corba_auth_scheme) && (types[i] < 3)) {
+                    corba_auth_scheme = types[i];
                 }
             }
-            if (rfb_auth_scheme === 0) {
+            if (corba_auth_scheme === 0) {
                 return fail("Unsupported security types: " + types);
             }
             
-            ws.send([rfb_auth_scheme]);
+            ws.send([corba_auth_scheme]);
         } else {
             // Server decides
             if (ws.rQwait("security scheme", 4)) { return false; }
-            rfb_auth_scheme = ws.rQshift32();
+            corba_auth_scheme = ws.rQshift32();
         }
         updateState('Authentication',
-                "Authenticating using scheme: " + rfb_auth_scheme);
+                "Authenticating using scheme: " + corba_auth_scheme);
         init_msg();  // Recursive fallthrough (workaround JSLint complaint)
         break;
 
     // Triggered by fallthough, not by server message
     case 'Authentication' :
-        //Util.Debug("Security auth scheme: " + rfb_auth_scheme);
-        switch (rfb_auth_scheme) {
+        //Util.Debug("Security auth scheme: " + corba_auth_scheme);
+        switch (corba_auth_scheme) {
             case 0:  // connection failed
                 if (ws.rQwait("auth reason", 4)) { return false; }
                 strlen = ws.rQshift32();
                 reason = ws.rQshiftStr(strlen);
                 return fail("Auth failure: " + reason);
             case 1:  // no authentication
-                if (rfb_version >= 3.8) {
+                if (corba_version >= 3.8) {
                     updateState('SecurityResult');
                     return;
                 }
                 // Fall through to ClientInitialisation
                 break;
-            case 2:  // VNC authentication
-                if (rfb_password.length === 0) {
+            case 2:  // mirror4cast authentication
+                if (corba_password.length === 0) {
                     // Notify via both callbacks since it is kind of
-                    // a RFB state change and a UI interface issue.
+                    // a CORBA state change and a UI interface issue.
                     updateState('password', "Password Required");
                     conf.onPasswordRequired(that);
                     return;
                 }
                 if (ws.rQwait("auth challenge", 16)) { return false; }
                 challenge = ws.rQshiftBytes(16);
-                //Util.Debug("Password: " + rfb_password);
+                //Util.Debug("Password: " + corba_password);
                 //Util.Debug("Challenge: " + challenge +
                 //           " (" + challenge.length + ")");
-                response = genDES(rfb_password, challenge);
+                response = genDES(corba_password, challenge);
                 //Util.Debug("Response: " + response +
                 //           " (" + response.length + ")");
                 
@@ -787,7 +776,7 @@ init_msg = function() {
                 updateState('SecurityResult');
                 return;
             default:
-                fail("Unsupported auth scheme: " + rfb_auth_scheme);
+                fail("Unsupported auth scheme: " + corba_auth_scheme);
                 return;
         }
         updateState('ClientInitialisation', "No auth required");
@@ -795,13 +784,13 @@ init_msg = function() {
         break;
 
     case 'SecurityResult' :
-        if (ws.rQwait("VNC auth response ", 4)) { return false; }
+        if (ws.rQwait("Mirror4cast auth response ", 4)) { return false; }
         switch (ws.rQshift32()) {
             case 0:  // OK
                 // Fall through to ClientInitialisation
                 break;
             case 1:  // failed
-                if (rfb_version >= 3.8) {
+                if (corba_version >= 3.8) {
                     length = ws.rQshift32();
                     if (ws.rQwait("SecurityResult reason", length, 8)) {
                         return false;
@@ -911,7 +900,7 @@ init_msg = function() {
 };
 
 
-/* Normal RFB/VNC server message handler */
+/* Normal CORBA/mirror4cast server message handler */
 normal_msg = function() {
     //Util.Debug(">> normal_msg");
 
@@ -992,7 +981,7 @@ framebufferUpdate = function() {
     }
 
     while (FBU.rects > 0) {
-        if (rfb_state !== "normal") {
+        if (corba_state !== "normal") {
             return false;
         }
         if (ws.rQwait("FBU", FBU.bytes)) { return false; }
@@ -1765,12 +1754,12 @@ clientCutText = function(text) {
 that.connect = function(host, port, password, path) {
     //Util.Debug(">> connect");
 
-    rfb_host       = host;
-    rfb_port       = port;
-    rfb_password   = (password !== undefined)   ? password : "";
-    rfb_path       = (path !== undefined) ? path : "";
+    corba_host       = host;
+    corba_port       = port;
+    corba_password   = (password !== undefined)   ? password : "";
+    corba_path       = (path !== undefined) ? path : "";
 
-    if ((!rfb_host) || (!rfb_port)) {
+    if ((!corba_host) || (!corba_port)) {
         return fail("Must set host and port");
     }
 
@@ -1786,13 +1775,13 @@ that.disconnect = function() {
 };
 
 that.sendPassword = function(passwd) {
-    rfb_password = passwd;
-    rfb_state = "Authentication";
+    corba_password = passwd;
+    corba_state = "Authentication";
     setTimeout(init_msg, 1);
 };
 
 that.sendCtrlAltDel = function() {
-    if (rfb_state !== "normal" || conf.view_only) { return false; }
+    if (corba_state !== "normal" || conf.view_only) { return false; }
     Util.Info("Sending Ctrl-Alt-Del");
     var arr = [];
     arr = arr.concat(keyEvent(0xFFE3, 1)); // Control
@@ -1808,7 +1797,7 @@ that.sendCtrlAltDel = function() {
 // Send a key press. If 'down' is not specified then send a down key
 // followed by an up key.
 that.sendKey = function(code, down) {
-    if (rfb_state !== "normal" || conf.view_only) { return false; }
+    if (corba_state !== "normal" || conf.view_only) { return false; }
     var arr = [];
     if (typeof down !== 'undefined') {
         Util.Info("Sending key code (" + (down ? "down" : "up") + "): " + code);
@@ -1823,7 +1812,7 @@ that.sendKey = function(code, down) {
 };
 
 that.clipboardPasteFrom = function(text) {
-    if (rfb_state !== "normal") { return; }
+    if (corba_state !== "normal") { return; }
     //Util.Debug(">> clipboardPasteFrom: " + text.substr(0,40) + "...");
     ws.send(clientCutText(text));
     //Util.Debug("<< clipboardPasteFrom");
@@ -1836,14 +1825,14 @@ that.testMode = function(override_send) {
 
     checkEvents = function () { /* Stub Out */ };
     that.connect = function(host, port, password) {
-            rfb_host = host;
-            rfb_port = port;
-            rfb_password = password;
-            updateState('ProtocolVersion', "Starting VNC handshake");
+            corba_host = host;
+            corba_port = port;
+            corba_password = password;
+            updateState('ProtocolVersion', "Starting mirror4cast handshake");
         };
 };
 
 
 return constructor();  // Return the public API interface
 
-}  // End of RFB()
+}  // End of CORBA()

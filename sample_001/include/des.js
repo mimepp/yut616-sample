@@ -1,13 +1,7 @@
 /*
- * Ported from Flashlight VNC ActionScript implementation:
- *     http://www.wizhelp.com/flashlight-vnc/
- *
  * Full attribution follows:
  *
  * -------------------------------------------------------------------------
- *
- * This DES class has been extracted from package Acme.Crypto for use in VNC.
- * The unnecessary odd parity code has been removed.
  *
  * These changes are:
  *  Copyright (C) 1999 AT&T Laboratories Cambridge.  All Rights Reserved.

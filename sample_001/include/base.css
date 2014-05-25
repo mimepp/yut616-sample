@@ -1,10 +1,3 @@
-/*
- * noVNC base CSS
- * Copyright (C) 2012 Joel Martin
- * noVNC is licensed under the LGPL-3 (see LICENSE.txt)
- * This file is licensed under the 2-Clause BSD license (see LICENSE.txt).
- */
-
 body {
   margin:0;
   padding:0;
@@ -20,108 +13,108 @@ html {
   height:100%;
 }
 
-#noVNC_controls ul {
+#mirror4cast_controls ul {
   list-style: none;
   margin: 0px;
   padding: 0px;
 }
-#noVNC_controls li {
+#mirror4cast_controls li {
   padding-bottom:8px;
 }
 
-#noVNC_host {
+#mirror4cast_host {
   width:150px;
 }
-#noVNC_port {
+#mirror4cast_port {
   width: 80px;
 }
-#noVNC_password {
+#mirror4cast_password {
   width: 150px;
 }
-#noVNC_encrypt {
+#mirror4cast_encrypt {
 }
-#noVNC_connectTimeout {
+#mirror4cast_connectTimeout {
   width: 30px;
 }
-#noVNC_path {
+#mirror4cast_path {
   width: 100px;
 }
-#noVNC_connect_button {
+#mirror4cast_connect_button {
   width: 110px;
   float:right;
 }
 
 
-#noVNC_view_drag_button {
+#mirror4cast_view_drag_button {
   display: none;
 }
 #sendCtrlAltDelButton {
   display: none;
 }
-#noVNC_mobile_buttons {
+#mirror4cast_mobile_buttons {
   display: none;
 }
 
-.noVNC-buttons-left {
+.mirror4cast-buttons-left {
   float: left;
   padding-left:10px;
   padding-top:4px;
 }
 
-.noVNC-buttons-right {
+.mirror4cast-buttons-right {
   float:right;
   right: 0px;
   padding-right:10px;
   padding-top:4px;
 }
 
-#noVNC_status_bar {
+#mirror4cast_status_bar {
   margin-top: 0px;
   padding: 0px;
 }
 
-#noVNC_status_bar div {
+#mirror4cast_status_bar div {
   font-size: 12px;
   padding-top: 4px;
   width:100%;
 }
 
-#noVNC_status {
+#mirror4cast_status {
   height:20px;
   text-align: center;
 }
-#noVNC_settings_menu {
+#mirror4cast_settings_menu {
   margin: 3px;
   text-align: left;
 }
-#noVNC_settings_menu ul {
+#mirror4cast_settings_menu ul {
   list-style: none;
   margin: 0px;
   padding: 0px;
 }
 
-#noVNC_apply {
+#mirror4cast_apply {
   float:right;
 }
 
-.noVNC_status_normal {
+.mirror4cast_status_normal {
   background: #eee;
 }
-.noVNC_status_error {
+.mirror4cast_status_error {
   background: #f44;
 }
-.noVNC_status_warn {
+.mirror4cast_status_warn {
   background: #ff4;
 }
 
-/* Do not set width/height for VNC_screen or VNC_canvas or incorrect
- * scaling will occur. Canvas resizes to remote VNC settings */
-#noVNC_screen_pad {
+/* Do not set width/height for mirror4cast_screen or mirror4cast_canvas or incorrect
+ * scaling will occur. Canvas resizes to remote mirror4cast settings */
+#mirror4cast_screen_pad {
   margin: 0px;
   padding: 0px;
   height: 44px;
 }
-#noVNC_screen {
+#mirror4cast_screen {
   text-align: center;
   display: table;
   width:100%;
@@ -129,45 +122,45 @@ html {
   /*border-top-left-radius: 800px 600px;*/
 }
 
-#noVNC_container, #noVNC_canvas {
+#mirror4cast_container, #mirror4cast_canvas {
   margin: 0px;
   padding: 0px;
 }
 
-#noVNC_canvas {
+#mirror4cast_canvas {
   left: 0px;
 }
 
-#VNC_clipboard_clear_button {
+#mirror4cast_clipboard_clear_button {
   float:right;
 }
-#VNC_clipboard_text {
+#mirror4cast_clipboard_text {
   font-size: 11px;
 }
 
-#noVNC_clipboard_clear_button {
+#mirror4cast_clipboard_clear_button {
   float:right;
 }
 
 /*Bubble contents divs*/
-#noVNC_settings {
+#mirror4cast_settings {
   display:none;
   margin-top:77px;
   right:20px;
   position:fixed;
 }
 
-#noVNC_controls {
+#mirror4cast_controls {
   display:none;
   margin-top:77px;
   right:12px;
   position:fixed;
 }
-#noVNC_controls.top:after  {
+#mirror4cast_controls.top:after  {
   right:15px;
 }
 
-#noVNC_description {
+#mirror4cast_description {
   display:none;
   position:fixed;
 
@@ -184,13 +177,13 @@ html {
   border-radius:10px;
 }
 
-#noVNC_clipboard {
+#mirror4cast_clipboard {
   display:none;
   margin-top:77px;
   right:30px;
   position:fixed;
 }
-#noVNC_clipboard.top:after {
+#mirror4cast_clipboard.top:after {
   right:85px;
 }
 
@@ -205,7 +198,7 @@ html {
   z-index: -1;
 }
 
-.noVNC_status_warn {
+.mirror4cast_status_warn {
   background-color:yellow;
 }
 
@@ -214,7 +207,7 @@ html {
  */
 
 /* Control bar */
-#noVNC-control-bar {
+#mirror4cast-control-bar {
   position:fixed;
   background: #b2bdcd; /* Old browsers */
   background: -moz-linear-gradient(top, #b2bdcd 0%, #899cb3 49%, #7e93af 51%, #6e84a3 100%); /* FF3.6+ */
@@ -232,7 +225,7 @@ html {
   z-index:200;
 }
 
-.noVNC_status_button {
+.mirror4cast_status_button {
   padding: 4px 4px;
   vertical-align: middle;
   border:1px solid #869dbc;
@@ -250,7 +243,7 @@ html {
   /*box-shadow:inset 0.4px 0.4px 0.4px #000000;*/
 }
 
-.noVNC_status_button_selected {
+.mirror4cast_status_button_selected {
   padding: 4px 4px;
   vertical-align: middle;
   border:1px solid #4366a9;
@@ -318,7 +311,7 @@ html {
   border-color:transparent #E0E0E0;
 }
 
-/*Default noVNC logo.*/
+/*Default mirror4cast logo.*/
 /* From: http://fonts.googleapis.com/css?family=Orbitron:700 */
 @font-face {
   font-family: 'Orbitron';
@@ -328,7 +321,7 @@ html {
                    url('Orbitron700.ttf') format('truetype');
 }
 
-#noVNC_logo {
+#mirror4cast_logo {
   margin-top: 170px;
   margin-left: 10px;
   color:yellow;
@@ -344,7 +337,7 @@ html {
 }
 
 
-#noVNC_logo span{
+#mirror4cast_logo span{
   color:green;
 }
 
@@ -354,50 +347,50 @@ html {
  */
 
 
-.noVNC_status_button {
+.mirror4cast_status_button {
   font-size: 12px;
 }
 
-#noVNC_clipboard_text {
+#mirror4cast_clipboard_text {
   width: 500px;
 }
 
-#noVNC_logo {
+#mirror4cast_logo {
   font-size: 180px;
 }
 
 @media screen and (min-width: 481px) and (max-width: 640px) {
-  .noVNC_status_button {
+  .mirror4cast_status_button {
     font-size: 10px;
   }
-  #noVNC_clipboard_text {
+  #mirror4cast_clipboard_text {
     width: 410px;
   }
-  #noVNC_logo {
+  #mirror4cast_logo {
     font-size: 150px;
   }
 }
 
 @media screen and (min-width: 321px) and (max-width: 480px) {
-  .noVNC_status_button {
+  .mirror4cast_status_button {
     font-size: 10px;
   }
-  #noVNC_clipboard_text {
+  #mirror4cast_clipboard_text {
     width: 250px;
   }
-  #noVNC_logo {
+  #mirror4cast_logo {
     font-size: 110px;
   }
 }
 
 @media screen and (max-width: 320px) {
-  .noVNC_status_button {
+  .mirror4cast_status_button {
     font-size: 9px;
   }
-  #noVNC_clipboard_text {
+  #mirror4cast_clipboard_text {
     width: 220px;
   }
-  #noVNC_logo {
+  #mirror4cast_logo {
     font-size: 90px;
   }
 }

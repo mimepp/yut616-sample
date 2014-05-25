@@ -1,18 +1,10 @@
-/*
- * noVNC: HTML5 VNC client
- * Copyright (C) 2012 Joel Martin
- * Licensed under LGPL-3 (see LICENSE.txt)
- *
- * See README.md for usage and integration instructions.
- */
-
 "use strict";
 /*jslint white: false, browser: true */
-/*global window, $D, Util, WebUtil, RFB, Display */
+/*global window, $D, Util, WebUtil, CORBA, Display */
 
 var UI = {
 
-rfb_state : 'loaded',
+corba_state : 'loaded',
 settingsOpen : false,
 connSettingsOpen : false,
 clipboardOpen: false,
@@ -26,13 +18,13 @@ load: function() {
     sheet = WebUtil.selectStylesheet();
     sheets = WebUtil.getStylesheets();
     for (i = 0; i < sheets.length; i += 1) {
-        UI.addOption($D('noVNC_stylesheet'),sheets[i].title, sheets[i].title);
+        UI.addOption($D('mirror4cast_stylesheet'),sheets[i].title, sheets[i].title);
     }
 
     // Logging selection dropdown
     llevels = ['error', 'warn', 'info', 'debug'];
     for (i = 0; i < llevels.length; i += 1) {
-        UI.addOption($D('noVNC_logging'),llevels[i], llevels[i]);
+        UI.addOption($D('mirror4cast_logging'),llevels[i], llevels[i]);
     }
 
     // Settings with immediate effects
@@ -58,28 +50,28 @@ load: function() {
     UI.initSetting('path', 'websockify');
     UI.initSetting('repeaterID', '');
 
-    UI.rfb = RFB({'target': $D('noVNC_canvas'),
+    UI.corba = CORBA({'target': $D('mirror4cast_canvas'),
                   'onUpdateState': UI.updateState,
                   'onClipboard': UI.clipReceive});
     UI.updateVisualState();
 
-    // Unfocus clipboard when over the VNC area
-    //$D('VNC_screen').onmousemove = function () {
-    //         var keyboard = UI.rfb.get_keyboard();
+    // Unfocus clipboard when over the mirror4cast area
+    //$D('mirror4cast_screen').onmousemove = function () {
+    //         var keyboard = UI.corba.get_keyboard();
     //        if ((! keyboard) || (! keyboard.get_focused())) {
-    //            $D('VNC_clipboard_text').blur();
+    //            $D('mirror4cast_clipboard_text').blur();
     //         }
     //    };
 
     // Show mouse selector buttons on touch screen devices
     if ('ontouchstart' in document.documentElement) {
         // Show mobile buttons
-        $D('noVNC_mobile_buttons').style.display = "inline";
+        $D('mirror4cast_mobile_buttons').style.display = "inline";
         UI.setMouseButton();
         // Remove the address bar
         setTimeout(function() { window.scrollTo(0, 1); }, 100);
         UI.forceSetting('clip', true);
-        $D('noVNC_clip').disabled = true;
+        $D('mirror4cast_clip').disabled = true;
     } else {
         UI.initSetting('clip', false);
     }
@@ -93,13 +85,13 @@ load: function() {
         //UI.setResize();
     }
 
-    $D('noVNC_host').focus();
+    $D('mirror4cast_host').focus();
 
     UI.setViewClip();
     Util.addEvent(window, 'resize', UI.setViewClip);
 
     Util.addEvent(window, 'beforeunload', function () {
-        if (UI.rfb_state === 'normal') {
+        if (UI.corba_state === 'normal') {
             return "You are currently connected.";
         }
     } );
@@ -107,7 +99,7 @@ load: function() {
     // Show description by default when hosted at for kanaka.github.com
     if (location.host === "kanaka.github.com") {
         // Open the description dialog
-        $D('noVNC_description').style.display = "block";
+        $D('mirror4cast_description').style.display = "block";
     } else {
         // Open the connect panel on first load
         UI.toggleConnectPanel();
@@ -116,7 +108,7 @@ load: function() {
 
 // Read form control compatible setting from cookie
 getSetting: function(name) {
-    var val, ctrl = $D('noVNC_' + name);
+    var val, ctrl = $D('mirror4cast_' + name);
     val = WebUtil.readCookie(name);
     if (ctrl.type === 'checkbox') {
         if (val.toLowerCase() in {'0':1, 'no':1, 'false':1}) {
@@ -132,7 +124,7 @@ getSetting: function(name) {
 // updates from control to current cookie setting.
 updateSetting: function(name, value) {
 
-    var i, ctrl = $D('noVNC_' + name);
+    var i, ctrl = $D('mirror4cast_' + name);
     // Save the cookie for this session
     if (typeof value !== 'undefined') {
         WebUtil.createCookie(name, value);
@@ -163,7 +155,7 @@ updateSetting: function(name, value) {
 
 // Save control setting to cookie
 saveSetting: function(name) {
-    var val, ctrl = $D('noVNC_' + name);
+    var val, ctrl = $D('mirror4cast_' + name);
     if (ctrl.type === 'checkbox') {
         val = ctrl.checked;
     } else if (typeof ctrl.options !== 'undefined') {
@@ -200,7 +192,7 @@ forceSetting: function(name, val) {
 // Show the clipboard panel
 toggleClipboardPanel: function() {
     // Close the description panel
-    $D('noVNC_description').style.display = "none";
+    $D('mirror4cast_description').style.display = "none";
     //Close settings if open
     if (UI.settingsOpen === true) {
         UI.settingsApply();
@@ -212,12 +204,12 @@ toggleClipboardPanel: function() {
     }
     //Toggle Clipboard Panel
     if (UI.clipboardOpen === true) {
-        $D('noVNC_clipboard').style.display = "none";
-        $D('clipboardButton').className = "noVNC_status_button";
+        $D('mirror4cast_clipboard').style.display = "none";
+        $D('clipboardButton').className = "mirror4cast_status_button";
         UI.clipboardOpen = false;
     } else {
-        $D('noVNC_clipboard').style.display = "block";
-        $D('clipboardButton').className = "noVNC_status_button_selected";
+        $D('mirror4cast_clipboard').style.display = "block";
+        $D('clipboardButton').className = "mirror4cast_status_button_selected";
         UI.clipboardOpen = true;
     }
 },
@@ -225,12 +217,12 @@ toggleClipboardPanel: function() {
 // Show the connection settings panel/menu
 toggleConnectPanel: function() {
     // Close the description panel
-    $D('noVNC_description').style.display = "none";
+    $D('mirror4cast_description').style.display = "none";
     //Close connection settings if open
     if (UI.settingsOpen === true) {
         UI.settingsApply();
         UI.closeSettingsMenu();
-        $D('connectButton').className = "noVNC_status_button";
+        $D('connectButton').className = "mirror4cast_status_button";
     }
     if (UI.clipboardOpen === true) {
         UI.toggleClipboardPanel();
@@ -238,14 +230,14 @@ toggleConnectPanel: function() {
 
     //Toggle Connection Panel
     if (UI.connSettingsOpen === true) {
-        $D('noVNC_controls').style.display = "none";
-        $D('connectButton').className = "noVNC_status_button";
+        $D('mirror4cast_controls').style.display = "none";
+        $D('connectButton').className = "mirror4cast_status_button";
         UI.connSettingsOpen = false;
     } else {
-        $D('noVNC_controls').style.display = "block";
-        $D('connectButton').className = "noVNC_status_button_selected";
+        $D('mirror4cast_controls').style.display = "block";
+        $D('connectButton').className = "mirror4cast_status_button_selected";
         UI.connSettingsOpen = true;
-        $D('noVNC_host').focus();
+        $D('mirror4cast_host').focus();
     }
 },
 
@@ -254,18 +246,18 @@ toggleConnectPanel: function() {
 //   On close, settings are applied
 toggleSettingsPanel: function() {
     // Close the description panel
-    $D('noVNC_description').style.display = "none";
+    $D('mirror4cast_description').style.display = "none";
     if (UI.settingsOpen) {
         UI.settingsApply();
         UI.closeSettingsMenu();
     } else {
         UI.updateSetting('encrypt');
         UI.updateSetting('true_color');
-        if (UI.rfb.get_display().get_cursor_uri()) {
+        if (UI.corba.get_display().get_cursor_uri()) {
             UI.updateSetting('cursor');
         } else {
             UI.updateSetting('cursor', false);
-            $D('noVNC_cursor').disabled = true;
+            $D('mirror4cast_cursor').disabled = true;
         }
         UI.updateSetting('clip');
         UI.updateSetting('shared');
@@ -283,7 +275,7 @@ toggleSettingsPanel: function() {
 // Open menu
 openSettingsMenu: function() {
     // Close the description panel
-    $D('noVNC_description').style.display = "none";
+    $D('mirror4cast_description').style.display = "none";
     if (UI.clipboardOpen === true) {
         UI.toggleClipboardPanel();
     }
@@ -291,15 +283,15 @@ openSettingsMenu: function() {
     if (UI.connSettingsOpen === true) {
         UI.toggleConnectPanel();
     }
-    $D('noVNC_settings').style.display = "block";
-    $D('settingsButton').className = "noVNC_status_button_selected";
+    $D('mirror4cast_settings').style.display = "block";
+    $D('settingsButton').className = "mirror4cast_status_button_selected";
     UI.settingsOpen = true;
 },
 
 // Close menu (without applying settings)
 closeSettingsMenu: function() {
-    $D('noVNC_settings').style.display = "none";
-    $D('settingsButton').className = "noVNC_status_button";
+    $D('mirror4cast_settings').style.display = "none";
+    $D('settingsButton').className = "mirror4cast_status_button";
     UI.settingsOpen = false;
 },
 
@@ -308,7 +300,7 @@ settingsApply: function() {
     //Util.Debug(">> settingsApply");
     UI.saveSetting('encrypt');
     UI.saveSetting('true_color');
-    if (UI.rfb.get_display().get_cursor_uri()) {
+    if (UI.corba.get_display().get_cursor_uri()) {
         UI.saveSetting('cursor');
     }
     UI.saveSetting('clip');
@@ -324,24 +316,24 @@ settingsApply: function() {
     WebUtil.selectStylesheet(UI.getSetting('stylesheet'));
     WebUtil.init_logging(UI.getSetting('logging'));
     UI.setViewClip();
-    UI.setViewDrag(UI.rfb.get_viewportDrag());
+    UI.setViewDrag(UI.corba.get_viewportDrag());
     //Util.Debug("<< settingsApply");
 },
 
 
 
 setPassword: function() {
-    UI.rfb.sendPassword($D('noVNC_password').value);
+    UI.corba.sendPassword($D('mirror4cast_password').value);
     //Reset connect button.
-    $D('noVNC_connect_button').value = "Connect";
-    $D('noVNC_connect_button').onclick = UI.Connect;
+    $D('mirror4cast_connect_button').value = "Connect";
+    $D('mirror4cast_connect_button').onclick = UI.Connect;
     //Hide connection panel.
     UI.toggleConnectPanel();
     return false;
 },
 
 sendCtrlAltDel: function() {
-    UI.rfb.sendCtrlAltDel();
+    UI.corba.sendCtrlAltDel();
 },
 
 setMouseButton: function(num) {
@@ -351,12 +343,12 @@ setMouseButton: function(num) {
         // Disable mouse buttons
         num = -1;
     }
-    if (UI.rfb) {
-        UI.rfb.get_mouse().set_touchButton(num);
+    if (UI.corba) {
+        UI.corba.get_mouse().set_touchButton(num);
     }
 
     for (b = 0; b < blist.length; b++) {
-        button = $D('noVNC_mouse_button' + blist[b]);
+        button = $D('mirror4cast_mouse_button' + blist[b]);
         if (blist[b] === num) {
             button.style.display = "";
         } else {
@@ -371,36 +363,36 @@ setMouseButton: function(num) {
     }
 },
 
-updateState: function(rfb, state, oldstate, msg) {
+updateState: function(corba, state, oldstate, msg) {
     var s, sb, c, d, cad, vd, klass;
-    UI.rfb_state = state;
-    s = $D('noVNC_status');
-    sb = $D('noVNC_status_bar');
+    UI.corba_state = state;
+    s = $D('mirror4cast_status');
+    sb = $D('mirror4cast_status_bar');
     switch (state) {
         case 'failed':
         case 'fatal':
-            klass = "noVNC_status_error";
+            klass = "mirror4cast_status_error";
             break;
         case 'normal':
-            klass = "noVNC_status_normal";
+            klass = "mirror4cast_status_normal";
             break;
         case 'disconnected':
-            $D('noVNC_logo').style.display = "block";
+            $D('mirror4cast_logo').style.display = "block";
             // Fall through
         case 'loaded':
-            klass = "noVNC_status_normal";
+            klass = "mirror4cast_status_normal";
             break;
         case 'password':
             UI.toggleConnectPanel();
 
-            $D('noVNC_connect_button').value = "Send Password";
-            $D('noVNC_connect_button').onclick = UI.setPassword;
-            $D('noVNC_password').focus();
+            $D('mirror4cast_connect_button').value = "Send Password";
+            $D('mirror4cast_connect_button').onclick = UI.setPassword;
+            $D('mirror4cast_password').focus();
 
-            klass = "noVNC_status_warn";
+            klass = "mirror4cast_status_warn";
             break;
         default:
-            klass = "noVNC_status_warn";
+            klass = "mirror4cast_status_warn";
             break;
     }
 
@@ -415,23 +407,23 @@ updateState: function(rfb, state, oldstate, msg) {
 
 // Disable/enable controls depending on connection state
 updateVisualState: function() {
-    var connected = UI.rfb_state === 'normal' ? true : false;
+    var connected = UI.corba_state === 'normal' ? true : false;
 
     //Util.Debug(">> updateVisualState");
-    $D('noVNC_encrypt').disabled = connected;
-    $D('noVNC_true_color').disabled = connected;
-    if (UI.rfb && UI.rfb.get_display() &&
-        UI.rfb.get_display().get_cursor_uri()) {
-        $D('noVNC_cursor').disabled = connected;
+    $D('mirror4cast_encrypt').disabled = connected;
+    $D('mirror4cast_true_color').disabled = connected;
+    if (UI.corba && UI.corba.get_display() &&
+        UI.corba.get_display().get_cursor_uri()) {
+        $D('mirror4cast_cursor').disabled = connected;
     } else {
         UI.updateSetting('cursor', false);
-        $D('noVNC_cursor').disabled = true;
+        $D('mirror4cast_cursor').disabled = true;
     }
-    $D('noVNC_shared').disabled = connected;
-    $D('noVNC_view_only').disabled = connected;
-    $D('noVNC_connectTimeout').disabled = connected;
-    $D('noVNC_path').disabled = connected;
-    $D('noVNC_repeaterID').disabled = connected;
+    $D('mirror4cast_shared').disabled = connected;
+    $D('mirror4cast_view_only').disabled = connected;
+    $D('mirror4cast_connectTimeout').disabled = connected;
+    $D('mirror4cast_path').disabled = connected;
+    $D('mirror4cast_repeaterID').disabled = connected;
 
     if (connected) {
         UI.setViewClip();
@@ -449,7 +441,7 @@ updateVisualState: function() {
     // It is enabled (toggled) by direct click on the button
     UI.setViewDrag(false);
 
-    switch (UI.rfb_state) {
+    switch (UI.corba_state) {
         case 'fatal':
         case 'failed':
         case 'loaded':
@@ -467,9 +459,9 @@ updateVisualState: function() {
 },
 
 
-clipReceive: function(rfb, text) {
+clipReceive: function(corba, text) {
     Util.Debug(">> UI.clipReceive: " + text.substr(0,40) + "...");
-    $D('noVNC_clipboard_text').value = text;
+    $D('mirror4cast_clipboard_text').value = text;
     Util.Debug("<< UI.clipReceive");
 },
 
@@ -480,57 +472,57 @@ connect: function() {
     UI.closeSettingsMenu();
     UI.toggleConnectPanel();
 
-    host = $D('noVNC_host').value;
-    port = $D('noVNC_port').value;
-    password = $D('noVNC_password').value;
-    path = $D('noVNC_path').value;
+    host = $D('mirror4cast_host').value;
+    port = $D('mirror4cast_port').value;
+    password = $D('mirror4cast_password').value;
+    path = $D('mirror4cast_path').value;
     if ((!host) || (!port)) {
         throw("Must set host and port");
     }
 
-    UI.rfb.set_encrypt(UI.getSetting('encrypt'));
-    UI.rfb.set_true_color(UI.getSetting('true_color'));
-    UI.rfb.set_local_cursor(UI.getSetting('cursor'));
-    UI.rfb.set_shared(UI.getSetting('shared'));
-    UI.rfb.set_view_only(UI.getSetting('view_only'));
-    UI.rfb.set_connectTimeout(UI.getSetting('connectTimeout'));
-    UI.rfb.set_repeaterID(UI.getSetting('repeaterID'));
+    UI.corba.set_encrypt(UI.getSetting('encrypt'));
+    UI.corba.set_true_color(UI.getSetting('true_color'));
+    UI.corba.set_local_cursor(UI.getSetting('cursor'));
+    UI.corba.set_shared(UI.getSetting('shared'));
+    UI.corba.set_view_only(UI.getSetting('view_only'));
+    UI.corba.set_connectTimeout(UI.getSetting('connectTimeout'));
+    UI.corba.set_repeaterID(UI.getSetting('repeaterID'));
 
-    UI.rfb.connect(host, port, password, path);
+    UI.corba.connect(host, port, password, path);
 
     //Close dialog.
     setTimeout(UI.setBarPosition, 100);
-    $D('noVNC_logo').style.display = "none";
+    $D('mirror4cast_logo').style.display = "none";
 },
 
 disconnect: function() {
     UI.closeSettingsMenu();
-    UI.rfb.disconnect();
+    UI.corba.disconnect();
 
-    $D('noVNC_logo').style.display = "block";
+    $D('mirror4cast_logo').style.display = "block";
     UI.connSettingsOpen = false;
     UI.toggleConnectPanel();
 },
 
 displayBlur: function() {
-    UI.rfb.get_keyboard().set_focused(false);
-    UI.rfb.get_mouse().set_focused(false);
+    UI.corba.get_keyboard().set_focused(false);
+    UI.corba.get_mouse().set_focused(false);
 },
 
 displayFocus: function() {
-    UI.rfb.get_keyboard().set_focused(true);
-    UI.rfb.get_mouse().set_focused(true);
+    UI.corba.get_keyboard().set_focused(true);
+    UI.corba.get_mouse().set_focused(true);
 },
 
 clipClear: function() {
-    $D('noVNC_clipboard_text').value = "";
-    UI.rfb.clipboardPasteFrom("");
+    $D('mirror4cast_clipboard_text').value = "";
+    UI.corba.clipboardPasteFrom("");
 },
 
 clipSend: function() {
-    var text = $D('noVNC_clipboard_text').value;
+    var text = $D('mirror4cast_clipboard_text').value;
     Util.Debug(">> UI.clipSend: " + text.substr(0,40) + "...");
-    UI.rfb.clipboardPasteFrom(text);
+    UI.corba.clipboardPasteFrom(text);
     Util.Debug("<< UI.clipSend");
 },
 
@@ -539,8 +531,8 @@ clipSend: function() {
 setViewClip: function(clip) {
     var display, cur_clip, pos, new_w, new_h;
 
-    if (UI.rfb) {
-        display = UI.rfb.get_display();
+    if (UI.corba) {
+        display = UI.corba.get_display();
     } else {
         return;
     }
@@ -559,13 +551,13 @@ setViewClip: function(clip) {
         // Turn clipping off
         UI.updateSetting('clip', false);
         display.set_viewport(false);
-        $D('noVNC_canvas').style.position = 'static';
+        $D('mirror4cast_canvas').style.position = 'static';
         display.viewportChange();
     }
     if (UI.getSetting('clip')) {
         // If clipping, update clipping settings
-        $D('noVNC_canvas').style.position = 'absolute';
-        pos = Util.getPosition($D('noVNC_canvas'));
+        $D('mirror4cast_canvas').style.position = 'absolute';
+        pos = Util.getPosition($D('mirror4cast_canvas'));
         new_w = window.innerWidth - pos.x;
         new_h = window.innerHeight - pos.y;
         display.set_viewport(true);
@@ -575,11 +567,11 @@ setViewClip: function(clip) {
 
 // Toggle/set/unset the viewport drag/move button
 setViewDrag: function(drag) {
-    var vmb = $D('noVNC_view_drag_button');
-    if (!UI.rfb) { return; }
+    var vmb = $D('mirror4cast_view_drag_button');
+    if (!UI.corba) { return; }
 
-    if (UI.rfb_state === 'normal' &&
-        UI.rfb.get_display().get_viewport()) {
+    if (UI.corba_state === 'normal' &&
+        UI.corba.get_display().get_viewport()) {
         vmb.style.display = "inline";
     } else {
         vmb.style.display = "none";
@@ -587,14 +579,14 @@ setViewDrag: function(drag) {
 
     if (typeof(drag) === "undefined") {
         // If not specified, then toggle
-        drag = !UI.rfb.get_viewportDrag();
+        drag = !UI.corba.get_viewportDrag();
     }
     if (drag) {
-        vmb.className = "noVNC_status_button_selected";
-        UI.rfb.set_viewportDrag(true);
+        vmb.className = "mirror4cast_status_button_selected";
+        UI.corba.set_viewportDrag(true);
     } else {
-        vmb.className = "noVNC_status_button";
-        UI.rfb.set_viewportDrag(false);
+        vmb.className = "mirror4cast_status_button";
+        UI.corba.set_viewportDrag(false);
     }
 },
 
@@ -603,16 +595,16 @@ showKeyboard: function() {
     if(UI.keyboardVisible === false) {
         $D('keyboardinput').focus();
         UI.keyboardVisible = true;
-        $D('showKeyboard').className = "noVNC_status_button_selected";
+        $D('showKeyboard').className = "mirror4cast_status_button_selected";
     } else if(UI.keyboardVisible === true) {
         $D('keyboardinput').blur();
-        $D('showKeyboard').className = "noVNC_status_button";
+        $D('showKeyboard').className = "mirror4cast_status_button";
         UI.keyboardVisible = false;
     }
 },
 
 keyInputBlur: function() {
-    $D('showKeyboard').className = "noVNC_status_button";
+    $D('showKeyboard').className = "mirror4cast_status_button";
     //Weird bug in iOS if you change keyboardVisible
     //here it does not actually occur so next time
     //you click keyboard icon it doesnt work.
@@ -646,11 +638,11 @@ addOption: function(selectbox,text,value )
 },
 
 setBarPosition: function() {
-    $D('noVNC-control-bar').style.top = (window.pageYOffset) + 'px';
-    $D('noVNC_mobile_buttons').style.left = (window.pageXOffset) + 'px';
+    $D('mirror4cast-control-bar').style.top = (window.pageYOffset) + 'px';
+    $D('mirror4cast_mobile_buttons').style.left = (window.pageXOffset) + 'px';
 
-    var vncwidth = $D('noVNC_screen').style.offsetWidth;
-    $D('noVNC-control-bar').style.width = vncwidth + 'px';
+    var mirror4castwidth = $D('mirror4cast_screen').style.offsetWidth;
+    $D('mirror4cast-control-bar').style.width = mirror4castwidth + 'px';
 }
 
 };

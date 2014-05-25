@@ -1,14 +1,8 @@
-/*
- * noVNC: HTML5 VNC client
- * Copyright (C) 2012 Joel Martin
- * Licensed under LGPL-3 (see LICENSE.LGPL-3)
- */
-
 "use strict";
 /*jslint browser: true, white: false */
-/*global Util, VNC_frame_data, finish */
+/*global Util, mirror4cast_frame_data, finish */
 
-var rfb, mode, test_state, frame_idx, frame_length,
+var corba, mode, test_state, frame_idx, frame_length,
     iteration, iterations, istart_time,
 
     // Pre-declarations for jslint
@@ -21,10 +15,10 @@ send_array = function (arr) {
 
 next_iteration = function () {
     if (iteration === 0) {
-        frame_length = VNC_frame_data.length;
+        frame_length = mirror4cast_frame_data.length;
         test_state = 'running';
     } else {
-        rfb.disconnect();
+        corba.disconnect();
     }
     
     if (test_state !== 'running') { return; }
@@ -37,7 +31,7 @@ next_iteration = function () {
 
     frame_idx = 0;
     istart_time = (new Date()).getTime();
-    rfb.connect('test', 0, "bogus");
+    corba.connect('test', 0, "bogus");
 
     queue_next_packet();
 
@@ -47,11 +41,11 @@ queue_next_packet = function () {
     var frame, foffset, toffset, delay;
     if (test_state !== 'running') { return; }
 
-    frame = VNC_frame_data[frame_idx];
+    frame = mirror4cast_frame_data[frame_idx];
     while ((frame_idx < frame_length) && (frame.charAt(0) === "}")) {
         //Util.Debug("Send frame " + frame_idx);
         frame_idx += 1;
-        frame = VNC_frame_data[frame_idx];
+        frame = mirror4cast_frame_data[frame_idx];
     }
 
     if (frame === 'EOF') {
@@ -81,8 +75,8 @@ queue_next_packet = function () {
 
 do_packet = function () {
     //Util.Debug("Processing frame: " + frame_idx);
-    var frame = VNC_frame_data[frame_idx];
-    rfb.recv_message({'data' : frame.slice(frame.indexOf('{', 1) + 1)});
+    var frame = mirror4cast_frame_data[frame_idx];
+    corba.recv_message({'data' : frame.slice(frame.indexOf('{', 1) + 1)});
     frame_idx += 1;
 
     queue_next_packet();
